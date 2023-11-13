@@ -1,0 +1,12 @@
+---
+- name: Install Apache
+  ansible.builtin.yum:
+    name: httpd
+    state: latest
+
+- name: Start Apache
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: yes
+

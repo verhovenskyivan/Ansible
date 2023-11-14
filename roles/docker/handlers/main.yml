@@ -1,1 +1,8 @@
+---
+- name: Restart Docker
+  ansible.builtin.systemd:
+    name: docker
+    state: restarte
 
+- name: Prune all
+  ansible.builtin.shell: docker system prune -a -f

@@ -1,0 +1,5 @@
+---
+dependencies:
+  - name: geerlingguy.docker
+    src: https://github.com/geerlingguy/ansible-role-docker
+    version: v3.9.0

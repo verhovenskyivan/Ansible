@@ -1,0 +1,12 @@
+nginx_listen_port: 80
+nginx_server_name: "example.com"
+nginx_index: "index.html"
+nginx_root_path: "/var/www/html"
+
+nginx_user: "www-data"
+nginx_group: "www-data"
+
+nginx_config_file_path: "/etc/nginx/sites-available/default"
+
+nginx_access_log_path: "/var/log/nginx/access.log"
+nginx_error_log_path: "/var/log/nginx/error.log"

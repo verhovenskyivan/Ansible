@@ -1,0 +1,7 @@
+---
+- name : Install docker and k8s on remote server
+  hosts: Linux
+  become: true
+  roles:
+    - k8s-common
+    - k8s-setup

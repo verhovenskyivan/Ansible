@@ -1,0 +1,35 @@
+---
+
+- name: Add Kubernetes GPG key
+  rpm_key:
+    key: "https://packages.cloud.google.com/yum/doc/yum-key.gpg"
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Add Kubernetes YUM repository
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes
+    baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64"
+    gpgkey: "https://packages.cloud.google.com/yum/doc/yum-key.gpg"
+    enabled: 1
+    gpgcheck: 1
+  when: ansible_os_family == "RedHat"
+
+- name: Update repositories
+  yum:
+    name: '*'
+    state: latest
+
+- name: Copy kubernetes repo
+  copy:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+- name: Install kubelet kubeadm kubectl
+  shell: |
+        sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+- name: Start and enable
+  service:
+    name: kubelet
+    state: started
+    enabled: yes

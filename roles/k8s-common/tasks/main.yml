@@ -1,0 +1,26 @@
+---
+
+- name: Update package manager cache
+  package_facts:
+  when: ansible_os_family == 'Debian'
+
+- name: Update YUM package manager cache
+  yum:
+    name: '*'
+    state: latest
+  when: ansible_os_family == 'RedHat'
+
+- name: Check if Docker is installed
+  stat:
+    path: /usr/bin/docker
+  register: docker_installed
+
+- name: Install necessary packages
+  package:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - curl
+      - vim
+      - "{{ 'docker-ce' if docker_installed.stat.exists else [] }}"

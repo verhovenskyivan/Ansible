@@ -1,0 +1,6 @@
+---
+- name: Docker-compose run
+  hosts: all
+  become: yes
+  roles:
+    - docker-compose             

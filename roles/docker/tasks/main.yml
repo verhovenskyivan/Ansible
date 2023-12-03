@@ -1,1 +1,51 @@
+---
+- name: Import Docker GPG key
+  ansible.builtin.shell: "rpm --import https://download.docker.com/linux/centos/gpg"
 
+- name: Install packages
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - yum-utils
+    - device-mapper
+    - lvm2
+
+- name: Add Docker repo
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+    mode: 0644
+- block:
+    - name: Install Docker CE RedHat
+      ansible.builtin.yum:
+        name: docker-ce
+        state: present
+    - name: Start Docker RedHat
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+  when: ansible_os_family == "RedHat"
+
+- block:
+    - name: Install Docker CE Debian
+      ansible.builtin.yum:
+        name: docker-ce
+        state: present
+    - name: Start Docker Debian
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+  when: ansible_os_family == "Debian"
+
+- name: Create Docker network
+  ansible.builtin.command: docker network create "{{ docker_network_name }}"
+  ignore_errors: yes
+- name: Remove previous container
+  ansible.builtin.command: docker rm -f {{ docker_container_name }}
+  ignore_errors: yes
+
+- name: Run Docker container
+  ansible.builtin.command: " docker run -d --name {{ docker_container_name }} -p {{ docker_ports | join(' -p ') }} --network {{ docker_network_name }} {{ docker_image }}"

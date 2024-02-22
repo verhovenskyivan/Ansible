@@ -1,0 +1,37 @@
+---
+- name: Install MinIO
+  hosts: minio_servers
+  become: yes
+
+  tasks:
+    - name: Add MinIO repository
+      apt_repository:
+        repo: "deb https://dl.min.io/server/minio/deb/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
+        state: present
+        filename: minio
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+
+    - name: Install MinIO
+      package:
+        name: minio
+        state: latest
+      when: ansible_os_family == 'Debian'
+
+    # Additional tasks for other distributions can be added here
+
+- name: Configure MinIO
+  hosts: minio_servers
+  become: yes
+
+  tasks:
+    - name: Create MinIO data directory
+      file:
+        path: /data/minio
+        state: directory
+
+    - name: Start MinIO server
+      command: minio server /data/minio
+      async: 1
+      poll: 0
+      ignore_errors: yes

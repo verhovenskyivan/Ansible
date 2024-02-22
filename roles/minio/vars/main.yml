@@ -1,0 +1,16 @@
+minio_access_key: "ваш_ключ_доступа"
+minio_secret_key: "ваш_секретный_ключ"
+
+minio_buckets:
+  - bucket1:
+      quota: 10MB
+  - bucket2:
+      quota: 10MB
+
+minio_users:
+  - username: user1
+    password: password1
+    policy: readwrite
+  - username: user2
+    password: password2
+    policy: readonly

@@ -1,0 +1,15 @@
+---
+- name: Create MinIO buckets and users
+  hosts: minio_servers
+  become: yes
+
+  tasks:
+    - name: Create MinIO buckets
+      command: mc mb {{ minio_access_key }}/{{ minio_secret_key }}@localhost/{{ item }}
+      loop: "{{ minio_buckets }}"
+
+    - name: Create MinIO users and apply policies
+      command: >
+        mc admin user add {{ item.username }} {{ item.password }} &&
+        mc admin policy set {{ item.username }} {{ item.policy }} user={{ item.username }}
+      loop: "{{ minio_users }}"

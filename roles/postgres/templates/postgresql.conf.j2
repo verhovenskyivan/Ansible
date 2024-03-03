@@ -1,0 +1,19 @@
+# Jinja2 template for PostgreSQL configuration file
+
+# Имя сервера
+listen_addresses = '{{ postgres_listen_addresses }}'
+
+# Порт для подключения к серверу
+port = {{ postgres_port }}
+
+# Максимальное количество соединений
+max_connections = {{ postgres_max_connections }}
+
+# Настройки памяти
+shared_buffers = {{ postgres_shared_buffers }}
+effective_cache_size = {{ postgres_effective_cache_size }}
+work_mem = {{ postgres_work_mem }}
+maintenance_work_mem = {{ postgres_maintenance_work_mem }}
+
+# Другие настройки
+# ...

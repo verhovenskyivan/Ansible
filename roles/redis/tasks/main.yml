@@ -1,0 +1,12 @@
+---
+- name: Install Redis
+  apt:
+    name: redis-server
+    state: present
+
+- name: Copy Redis configuration file
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis/redis.conf
+  notify: Restart Redis
+  become: yes

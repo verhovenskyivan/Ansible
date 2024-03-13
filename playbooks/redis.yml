@@ -1,0 +1,5 @@
+---
+- name: Deploy Redis
+  hosts: your_redis_hosts
+  roles:
+    - redis

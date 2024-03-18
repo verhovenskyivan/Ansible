@@ -1,0 +1,56 @@
+---
+- name: Generate random access key
+  community.general.random_string:
+    length: 10
+    chars: "{{ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789' }}"
+  register: access_key_result
+
+- name: Generate random secret key
+  community.general.random_string:
+    length: 20
+    chars: "{{ 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?`~' }}"
+  register: secret_key_result
+
+- name: Set access key and secret key as variables
+  set_fact:
+    access_key: "{{ access_key_result.result }}"
+    secret_key: "{{ secret_key_result.result }}"
+
+- name: Create Minio bucket
+  ansible.builtin.command: >
+    mc mb "{{minio_host}}/{{ item.name }}"
+  environment:
+    MC_HOSTS: "{{ minio_access_key}}:{{ minio_secret_key }}@{{ minio_host }}"
+  loop: "{{ minio_buckets }}"
+  when: minio_buckets is defined
+
+- name: Apply bucket policy
+  ansible.builtin.command: >
+    mc policy set "{{ item.policy }}" "{{ minio_host }}/{{ item.name }}"
+  environment:
+    MC_HOSTS: "{{ minio_access_key }}:{{ minio_secret_key }}@{{ minio_host }}"
+  loop: "{{ minio_buckets }}"
+  when: minio_buckets is defined
+
+- name: Create Minio users
+  ansible.builtin.command: >
+    mc admin user add "{{ item.name }}"  "{{ item.password }}"
+  environment:
+    MC_HOSTS: "{{ minio_access_key}}:{{ minio_secret_key }}@{{ minio_host }}"
+  loop: "{{ minio_users }}"
+  when: minio_users is defined
+
+- name: Apply bucket policy
+  command: >
+    mc policy set "{{ item.access }}" "{{ minio_host }}/{{ item.name }}"
+  environment:
+    MC_HOSTS: "{{ minio_access_key }}:{{ minio_secret_key }}@{{ minio_host }}"
+  loop: "{{ minio_users | map(attribute='buckets_acl') | flatten }}"
+
+- name: Write access key and secret key to HashiCorp Vault
+  hashivault_secret:
+    path: "{{ item.vault_path }}"
+    data:
+      access_key: "{{ access_key }}"
+      secret_key: "{{ secret_key }}"
+    loop: "{{ minio_users }}"

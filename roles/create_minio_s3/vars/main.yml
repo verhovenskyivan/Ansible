@@ -1,0 +1,8 @@
+minio_buckets:
+  - name: bucket-test
+    policy: rw
+
+
+minio_users:
+  - name: user.bucket-test
+    vault_path: "secret/minio_users/user-test"

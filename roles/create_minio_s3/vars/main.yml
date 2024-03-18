@@ -6,3 +6,4 @@ minio_buckets:
 minio_users:
   - name: user.bucket-test
     vault_path: "secret/minio_users/user-test"
+    bucket: bucket-test
